@@ -1,12 +1,21 @@
 import { useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import { formatDate } from '../lib/formatters';
-import { jobs } from '../lib/fake-data';
+import {useJob} from "../lib/graphql/hooks";
 
 function JobPage() {
   const { jobId } = useParams();
 
-  const job = jobs.find((job) => job.id === jobId);
+  const { job, loading, error } = useJob(jobId);
+
+  if (loading) {
+    return <div>loading...</div>;
+  }
+
+  if (error) {
+    return <div className='has-text-danger'>Error</div>;
+  }
+
   return (
     <div>
       <h1 className="title is-2">

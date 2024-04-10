@@ -4,7 +4,7 @@ import { formatDate } from '../lib/formatters';
 function JobList({ jobs }) {
   return (
     <ul className="box">
-      {jobs.map((job) => (
+      {jobs && jobs.map((job) => (
         <JobItem key={job.id} job={job} />
       ))}
     </ul>
