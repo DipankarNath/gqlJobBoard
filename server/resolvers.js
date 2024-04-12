@@ -1,10 +1,14 @@
 import { GraphQLError } from 'graphql';
-import { createJob, getJobs, getJob, getJobsByCompanyId, deleteJob, updateJob } from './db/jobs.js';
-import { getCompany } from './db/companies.js';
+import {createJob, getJobs, getJob, getJobsByCompanyId, deleteJob, updateJob, countJobs} from './db/jobs.js';
+import {getCompany} from './db/companies.js';
 
 export const resolvers = {
     Query: {
-        jobs: async () => getJobs(),
+        jobs: async (_root, { limit, offset }) => {
+            const items = await getJobs(limit, offset);
+            const totalCount = await countJobs();
+            return { items, totalCount };
+        },
         job: async (_root, args) => {
             const job = await getJob(args.id);
             if (!job) {
@@ -46,9 +50,7 @@ export const resolvers = {
     },
     Job: {
         date: (job) => toIsoDate(job.createdAt),
-        company: (job) => {
-            return getCompany(job.companyId);
-        },
+        company: (job, _args, { companyLoader }) => companyLoader.load(job.companyId),
     },
 };
 
